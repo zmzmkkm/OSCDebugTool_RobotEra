@@ -12,6 +12,8 @@ using XCharts.Runtime;
 
 public class LineCharCtrl : GraphAxisBase
 {
+    private const float curve_epsilon = 0.0001f;
+
     /// <summary>
     /// 数值:点位弹框事件
     /// 数据，线索引，点索引，点的Transform
@@ -226,6 +228,14 @@ public class LineCharCtrl : GraphAxisBase
         yAxis1.max = yAxisAtb1.axisMax;
         yAxis1.min = yAxisAtb1.axisMin;
 
+        EnsureAxisSpan(ref yAxisAtb0.axisMax, ref yAxisAtb0.axisMin);
+        EnsureAxisSpan(ref yAxisAtb1.axisMax, ref yAxisAtb1.axisMin);
+
+        yAxis0.max = yAxisAtb0.axisMax;
+        yAxis0.min = yAxisAtb0.axisMin;
+        yAxis1.max = yAxisAtb1.axisMax;
+        yAxis1.min = yAxisAtb1.axisMin;
+
         #endregion
 
 
@@ -325,8 +335,7 @@ public class LineCharCtrl : GraphAxisBase
                     lineData.isUseRightYAxis ? yAxisAtb1.axisMin : yAxisAtb0.axisMin,
                     xAxisAtb.axisMin);
 
-
-                lineAttribute.items.Add(pointPos);
+                TryAddLinePoint(lineAttribute.items, pointPos);
             }
 
             #endregion
@@ -357,14 +366,20 @@ public class LineCharCtrl : GraphAxisBase
                 .ToList();
             if (positivesY.Count > 0)
             {
-                yAxisAtb0.axisMax = MaxDivisibleValue.GetMaxDivisibleValue(positivesY.Max());
+                // yAxisAtb0.axisMax = MaxDivisibleValue.GetMaxDivisibleValue(positivesY.Max());
+                yAxisAtb0.axisMax = Math.Round(MaxDivisibleValue.GetMaxDivisibleValue(positivesY.Max()), 4);
+                if (yAxisAtb0.axisMax == 0)
+                {
+                    yAxisAtb0.axisMax = 25;
+                }
             }
 
             var negativesY = (from item in dataValue where !item.isUseRightYAxis from itemValue in item.values where itemValue.y < 0 select itemValue.y)
                 .ToList();
             if (negativesY.Count > 0)
             {
-                yAxisAtb0.axisMin = -(float)MaxDivisibleValue.GetMaxDivisibleValue(Mathf.Abs(negativesY.Min()));
+                // yAxisAtb0.axisMin = -(float)MaxDivisibleValue.GetMaxDivisibleValue(Mathf.Abs(negativesY.Min()));
+                yAxisAtb0.axisMin = -(float)Math.Round(MaxDivisibleValue.GetMaxDivisibleValue(Mathf.Abs(negativesY.Min())), 4);
             }
             else
             {
@@ -374,6 +389,25 @@ public class LineCharCtrl : GraphAxisBase
                 }
             }
         }
+
+
+        // if (positives0.Count > 0)
+        // {
+        //     // yAxisAtb0.axisMax = float.Parse(MaxDivisibleValue.GetMaxDivisibleValue(positives0.Max()).ToString("0.####"));
+        //     // yAxisAtb0.axisMax = Math.Round(MaxDivisibleValue.GetMaxDivisibleValue(positives0.Max()), 4);
+        // }
+        //
+        // var negatives0 = (from item in dataCategory
+        //     where !item.isUseRightYAxis
+        //     from itemValue in item.values
+        //     where itemValue.value < 0
+        //     select itemValue.value).ToList();
+        // if (negatives0.Count > 0)
+        // {
+        //     // yAxisAtb0.axisMin = -float.Parse(MaxDivisibleValue.GetMaxDivisibleValue(Mathf.Abs(negatives0.Min())).ToString("0.####"));
+        //     yAxisAtb0.axisMin = -(float)Math.Round(MaxDivisibleValue.GetMaxDivisibleValue(Mathf.Abs(negatives0.Min())), 4);
+        // }
+
 
         if (yAxisAtb1.isAutomatic)
         {
@@ -423,6 +457,17 @@ public class LineCharCtrl : GraphAxisBase
             }
         }
 
+
+        yAxis0.max = yAxisAtb0.axisMax;
+        yAxis0.min = yAxisAtb0.axisMin;
+        yAxis1.max = yAxisAtb1.axisMax;
+        yAxis1.min = yAxisAtb1.axisMin;
+        xAxis0.max = xAxisAtb.axisMax;
+        xAxis0.min = xAxisAtb.axisMin;
+
+        EnsureAxisSpan(ref yAxisAtb0.axisMax, ref yAxisAtb0.axisMin);
+        EnsureAxisSpan(ref yAxisAtb1.axisMax, ref yAxisAtb1.axisMin);
+        EnsureAxisSpan(ref xAxisAtb.axisMax, ref xAxisAtb.axisMin);
 
         yAxis0.max = yAxisAtb0.axisMax;
         yAxis0.min = yAxisAtb0.axisMin;
@@ -523,8 +568,7 @@ public class LineCharCtrl : GraphAxisBase
                     lineData.isUseRightYAxis ? yAxisAtb1.axisMin : yAxisAtb0.axisMin,
                     xAxisAtb.axisMin);
 
-
-                lineAttribute.items.Add(pointPos);
+                TryAddLinePoint(lineAttribute.items, pointPos);
             }
 
             #endregion
@@ -539,9 +583,14 @@ public class LineCharCtrl : GraphAxisBase
 
     private static List<Vector2> ConvertLineToCurve(List<Vector2> linePoints, int segmentsPerSegment = 10, float alpha = 0.5f)
     {
+        if (linePoints == null || linePoints.Count <= 1)
+        {
+            return linePoints == null ? new List<Vector2>() : new List<Vector2>(linePoints);
+        }
+
         if (segmentsPerSegment < 2) segmentsPerSegment = 2;
 
-        var curvePoints = new List<Vector2>();
+        var curvePoints = new List<Vector2>(linePoints.Count * segmentsPerSegment);
 
         // 对于每一段线段
         for (var i = 0; i < linePoints.Count - 1; i++)
@@ -553,10 +602,24 @@ public class LineCharCtrl : GraphAxisBase
             var p2 = linePoints[i + 1];
             var p3 = i == linePoints.Count - 2 ? linePoints[linePoints.Count - 1] : linePoints[i + 2];
 
-            // 在这段线段上生成多个点
-            for (var t = 0f; t <= 1f; t += 1f / segmentsPerSegment)
+            var startStep = i == 0 ? 0 : 1;
+
+            if (Mathf.Approximately(p1.y, p2.y))
             {
-                curvePoints.Add(CatmullRom(p0, p1, p2, p3, t, alpha));
+                for (var step = startStep; step <= segmentsPerSegment; step++)
+                {
+                    var t = step / (float)segmentsPerSegment;
+                    TryAddCurvePoint(curvePoints, Vector2.LerpUnclamped(p1, p2, t));
+                }
+
+                continue;
+            }
+
+            // 在这段线段上生成多个点
+            for (var step = startStep; step <= segmentsPerSegment; step++)
+            {
+                var t = step / (float)segmentsPerSegment;
+                TryAddCurvePoint(curvePoints, CatmullRom(p0, p1, p2, p3, t, alpha));
             }
         }
 
@@ -565,6 +628,16 @@ public class LineCharCtrl : GraphAxisBase
 
     private static Vector2 CatmullRom(Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3, float t, float alpha = 0.5f)
     {
+        if (t <= 0f)
+        {
+            return p1;
+        }
+
+        if (t >= 1f)
+        {
+            return p2;
+        }
+
         // var tSquared = t * t;
         // var tCubed = tSquared * t;
         //
@@ -583,13 +656,94 @@ public class LineCharCtrl : GraphAxisBase
         var dt1 = Mathf.Pow(Vector2.Distance(p1, p2), alpha);
         var dt2 = Mathf.Pow(Vector2.Distance(p2, p3), alpha);
 
+        if (dt1 <= curve_epsilon || dt0 + dt1 <= curve_epsilon || dt1 + dt2 <= curve_epsilon)
+        {
+            return Vector2.LerpUnclamped(p1, p2, t);
+        }
+
         var m1 = (p2 - p0) / (dt0 + dt1);
         var m2 = (p3 - p1) / (dt1 + dt2);
 
         var a = 2f * (p1 - p2) + m1 + m2;
         var b = -3f * (p1 - p2) - 2f * m1 - m2;
 
-        return p1 + t * (m1 + t * (b + t * a));
+        var result = p1 + t * (m1 + t * (b + t * a));
+
+        if (float.IsNaN(result.x) || float.IsNaN(result.y) || float.IsInfinity(result.x) || float.IsInfinity(result.y))
+        {
+            return Vector2.LerpUnclamped(p1, p2, t);
+        }
+
+        var minX = Mathf.Min(p1.x, p2.x);
+        var maxX = Mathf.Max(p1.x, p2.x);
+        result.x = maxX - minX <= curve_epsilon ? p1.x : Mathf.Clamp(result.x, minX, maxX);
+
+        return result;
+    }
+
+    private static void TryAddCurvePoint(List<Vector2> points, Vector2 point)
+    {
+        if (!IsFinite(point))
+        {
+            return;
+        }
+
+        if (points.Count > 0 && Vector2.SqrMagnitude(points[^1] - point) <= curve_epsilon * curve_epsilon)
+        {
+            return;
+        }
+
+        points.Add(point);
+    }
+
+    private static void TryAddLinePoint(List<Vector2> points, Vector3 point)
+    {
+        if (!IsFinite(point))
+        {
+            return;
+        }
+
+        var point2 = new Vector2(point.x, point.y);
+        if (points.Count > 0 && Vector2.SqrMagnitude(points[^1] - point2) <= curve_epsilon * curve_epsilon)
+        {
+            return;
+        }
+
+        points.Add(point2);
+    }
+
+    private static bool IsFinite(Vector2 point)
+    {
+        return !(float.IsNaN(point.x) || float.IsNaN(point.y) || float.IsInfinity(point.x) || float.IsInfinity(point.y));
+    }
+
+    private static bool IsFinite(Vector3 point)
+    {
+        return !(float.IsNaN(point.x) || float.IsNaN(point.y) || float.IsNaN(point.z) ||
+                 float.IsInfinity(point.x) || float.IsInfinity(point.y) || float.IsInfinity(point.z));
+    }
+
+    private static void EnsureAxisSpan(ref double axisMax, ref float axisMin)
+    {
+        if (Math.Abs(axisMax - axisMin) > curve_epsilon)
+        {
+            return;
+        }
+
+        if (axisMax >= 0 && axisMin >= 0)
+        {
+            axisMax += 1d;
+            return;
+        }
+
+        if (axisMax <= 0 && axisMin <= 0)
+        {
+            axisMin -= 1f;
+            return;
+        }
+
+        axisMax += 0.5d;
+        axisMin -= 0.5f;
     }
 
     #endregion

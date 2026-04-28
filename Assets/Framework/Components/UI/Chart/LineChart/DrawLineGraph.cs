@@ -52,6 +52,8 @@ public class LineAttribute
 [RequireComponent(typeof(CanvasRenderer))]
 public class DrawLineGraph : MaskableGraphic
 {
+    private const float mesh_epsilon = 0.0001f;
+
     /// <summary>
     /// 强制刷新OnPopulateMesh
     /// </summary>
@@ -82,22 +84,30 @@ public class DrawLineGraph : MaskableGraphic
             foreach (var lineAttribute in lineAttributes)
             {
                 if (lineAttribute.items is not { Count: > 0 }) continue;
-                var startPos = lineAttribute.items[0];
-                var itemsY = lineAttribute.items.Select(q => q.y).ToList();
+                var validItems = lineAttribute.items.Where(IsFinite).ToList();
+                if (validItems.Count < 2) continue;
+
+                var startPos = validItems[0];
+                var itemsY = validItems.Select(q => q.y).ToList();
                 var yMax = itemsY.Max();
                 var yMin = itemsY.Min();
-                for (var i = 1; i < lineAttribute.items.Count; i++)
+                for (var i = 1; i < validItems.Count; i++)
                 {
-                    var endPos = lineAttribute.items[i];
+                    var endPos = validItems[i];
+                    if (!IsValidSegment(startPos, endPos))
+                    {
+                        startPos = endPos;
+                        continue;
+                    }
 
                     if (lineAttribute.isLuminous)
                     {
-                        var upPos = i == 1 ? default : lineAttribute.items[i - 2];
-                        var nextPos = i == lineAttribute.items.Count - 1 ? default : lineAttribute.items[i + 1];
+                        var upPos = i == 1 ? default : validItems[i - 2];
+                        var nextPos = i == validItems.Count - 1 ? default : validItems[i + 1];
                         DrawMeshGraphic.GetQuadLuminous(vh, i, upPos, startPos, endPos, nextPos, lineAttribute.luminousWidth, lineAttribute.luminousColor, new Color(0f, 0f, 0f, 0f));
                     }
 
-                    if (lineAttribute.isShowFill)
+                    if (lineAttribute.isShowFill && IsFinite(lineAttribute.zeroPos))
                     {
                         DrawMeshGraphic.GetQuadFill(vh, startPos, endPos, lineAttribute.zeroPos, lineAttribute.fillColor0, lineAttribute.fillColor1, yMax, yMin, lineAttribute.fillType);
                     }
@@ -116,14 +126,38 @@ public class DrawLineGraph : MaskableGraphic
             foreach (var lineAttribute in lineAttributes)
             {
                 if (lineAttribute.items is not { Count: > 0 }) continue;
-                var upPos = lineAttribute.items[0];
-                for (var i = 1; i < lineAttribute.items.Count; i++)
+                var validItems = lineAttribute.items.Where(IsFinite).ToList();
+                if (validItems.Count < 2) continue;
+
+                var upPos = validItems[0];
+                for (var i = 1; i < validItems.Count; i++)
                 {
-                    var endPos = lineAttribute.items[i];
+                    var endPos = validItems[i];
+                    if (!IsValidSegment(upPos, endPos))
+                    {
+                        upPos = endPos;
+                        continue;
+                    }
+
                     vh.AddUIVertexQuad(DrawMeshGraphic.GetQuad(upPos, endPos, lineAttribute.lineColor, lineAttribute.lineColor, lineAttribute.lineWidth));
                     upPos = endPos;
                 }
             }
         }
+    }
+
+    private static bool IsValidSegment(Vector2 startPos, Vector2 endPos)
+    {
+        return IsFinite(startPos) && IsFinite(endPos) && Vector2.SqrMagnitude(endPos - startPos) > mesh_epsilon * mesh_epsilon;
+    }
+
+    private static bool IsFinite(Vector2 point)
+    {
+        return !(float.IsNaN(point.x) || float.IsNaN(point.y) || float.IsInfinity(point.x) || float.IsInfinity(point.y));
+    }
+
+    private static bool IsFinite(float value)
+    {
+        return !float.IsNaN(value) && !float.IsInfinity(value);
     }
 }

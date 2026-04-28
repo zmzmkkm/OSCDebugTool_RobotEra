@@ -18,6 +18,8 @@ namespace Prospect
     [Serializable]
     public class GraphAxisBase : ComponentRoot
     {
+        private const float axis_epsilon = 0.0001f;
+
         [HideInInspector] public RectTransform thisRect;
         [HideInInspector] public RectTransform chartRectTrs;
         [HideInInspector] public Vector2 chartSize;
@@ -320,6 +322,11 @@ namespace Prospect
                 }
             }
 
+            if (!IsFinite(xPos) || !IsFinite(yPos))
+            {
+                return Vector3.zero;
+            }
+
             return new Vector3(xPos, yPos, 0);
         }
 
@@ -333,12 +340,18 @@ namespace Prospect
         /// <returns></returns>
         public float ValueLenghtX(float xValue, float xAxisMax, float xAxisMin = 0)
         {
+            var axisRange = xAxisMax - xAxisMin;
+            if (Mathf.Abs(axisRange) <= axis_epsilon)
+            {
+                return 0f;
+            }
+
             if (xAxisMin >= 0)
             {
                 return Mathf.Abs(chartSize.x * ValuePercent(xValue, xAxisMax, xAxisMin));
             }
 
-            return Mathf.Abs(chartSize.x * ((xValue > 0 ? xAxisMax : xAxisMin) / (xAxisMax - xAxisMin)) * ValuePercent(xValue, xAxisMax, xAxisMin));
+            return Mathf.Abs(chartSize.x * ((xValue > 0 ? xAxisMax : xAxisMin) / axisRange) * ValuePercent(xValue, xAxisMax, xAxisMin));
         }
 
 
@@ -351,12 +364,18 @@ namespace Prospect
         /// <returns></returns>
         public float ValueLenghtY(float yValue, float yAxisMax, float yAxisMin = 0)
         {
+            var axisRange = yAxisMax - yAxisMin;
+            if (Mathf.Abs(axisRange) <= axis_epsilon)
+            {
+                return 0f;
+            }
+
             if (yAxisMin >= 0)
             {
                 return Mathf.Abs(chartSize.y * ValuePercent(yValue, yAxisMax, yAxisMin));
             }
 
-            return Mathf.Abs(chartSize.y * ((yValue > 0 ? yAxisMax : yAxisMin) / (yAxisMax - yAxisMin)) * ValuePercent(yValue, yAxisMax, yAxisMin));
+            return Mathf.Abs(chartSize.y * ((yValue > 0 ? yAxisMax : yAxisMin) / axisRange) * ValuePercent(yValue, yAxisMax, yAxisMin));
         }
 
         /// <summary>
@@ -370,12 +389,24 @@ namespace Prospect
         {
             if (xisMin >= 0)
             {
+                var axisRange = xisMax - xisMin;
+                if (Mathf.Abs(axisRange) <= axis_epsilon)
+                {
+                    return 0f;
+                }
+
                 value -= xisMin;
                 value = value > 0 ? value : 0;
-                return Mathf.Abs(1 / (xisMax - xisMin) * value);
+                return Mathf.Abs(value / axisRange);
             }
 
-            return Mathf.Abs(1 / (value > 0 ? xisMax : xisMin) * value);
+            var axisValue = value > 0 ? xisMax : xisMin;
+            if (Mathf.Abs(axisValue) <= axis_epsilon)
+            {
+                return 0f;
+            }
+
+            return Mathf.Abs(value / axisValue);
         }
 
         #endregion
@@ -390,7 +421,8 @@ namespace Prospect
         /// <returns></returns>
         public float XAxisPositiveLenght(float xAxisMax, float xAxisMin = 0)
         {
-            return Mathf.Abs(chartSize.x * xAxisMax / (xAxisMax - xAxisMin));
+            var axisRange = xAxisMax - xAxisMin;
+            return Mathf.Abs(axisRange) <= axis_epsilon ? 0f : Mathf.Abs(chartSize.x * xAxisMax / axisRange);
         }
 
         /// <summary>
@@ -401,7 +433,8 @@ namespace Prospect
         /// <returns></returns>
         public float XAxisNegativeLenght(float xAxisMax, float xAxisMin = 0)
         {
-            return Mathf.Abs(chartSize.x * xAxisMin / (xAxisMax - xAxisMin));
+            var axisRange = xAxisMax - xAxisMin;
+            return Mathf.Abs(axisRange) <= axis_epsilon ? 0f : Mathf.Abs(chartSize.x * xAxisMin / axisRange);
         }
 
         /// <summary>
@@ -412,7 +445,8 @@ namespace Prospect
         /// <returns></returns>
         public float YAxisPositiveLenght(float yAxisMax, float yAxisMin = 0)
         {
-            return Mathf.Abs(chartSize.y * yAxisMax / (yAxisMax - yAxisMin));
+            var axisRange = yAxisMax - yAxisMin;
+            return Mathf.Abs(axisRange) <= axis_epsilon ? 0f : Mathf.Abs(chartSize.y * yAxisMax / axisRange);
         }
 
         /// <summary>
@@ -423,7 +457,13 @@ namespace Prospect
         /// <returns></returns>
         public float YAxisNegativeLenght(float yAxisMax, float yAxisMin = 0)
         {
-            return Mathf.Abs(chartSize.y * yAxisMin / (yAxisMax - yAxisMin));
+            var axisRange = yAxisMax - yAxisMin;
+            return Mathf.Abs(axisRange) <= axis_epsilon ? 0f : Mathf.Abs(chartSize.y * yAxisMin / axisRange);
+        }
+
+        private static bool IsFinite(float value)
+        {
+            return !float.IsNaN(value) && !float.IsInfinity(value);
         }
 
         #endregion

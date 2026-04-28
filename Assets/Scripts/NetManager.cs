@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using Prospect;
 using SW;
 using TMPro;
@@ -21,9 +24,20 @@ public class NetManager : SingletonOfMono<NetManager>
     public LineCharCtrl webHeadLineChart;
     public LineCharCtrl unityHeadLineChart;
 
-    
-    public Toggle rightInTrackingToggle;
+
     public Toggle leftInTrackingToggle;
+    public Toggle rightInTrackingToggle;
+    public TMP_Text ipText;
+
+
+    private void Awake()
+    {
+        ipText.text = "IP: " + GetLocalIPv4();
+        
+        
+        
+        
+    }
 
 
     void Start()
@@ -36,7 +50,7 @@ public class NetManager : SingletonOfMono<NetManager>
 
         _lineChart.Init();
         _lineChart.SetAttribute();
-        
+
         _leftlineChart.Init();
         _leftlineChart.SetAttribute();
 
@@ -117,7 +131,7 @@ public class NetManager : SingletonOfMono<NetManager>
             time = TimestampConversion.GetNowTimeStamp(true),
             value = data,
         };
-        
+
         dataList.Add(aaa);
 
 
@@ -163,7 +177,7 @@ public class NetManager : SingletonOfMono<NetManager>
 
         _lineChart.Refresh();
     }
-    
+
     public void ShowPowerLeftLines(Vector7 data)
     {
         var aaa = new PosData()
@@ -321,6 +335,27 @@ public class NetManager : SingletonOfMono<NetManager>
         });
 
         unityHeadLineChart.Refresh();
+    }
+
+
+    public string GetLocalIPv4()
+    {
+        // 获取本地主机名
+        string hostName = Dns.GetHostName();
+        // 根据主机名获取所有关联的 IP 地址
+        IPHostEntry hostEntry = Dns.GetHostEntry(hostName);
+
+        // 遍历地址列表，找到第一个 IPv4 地址并返回
+        foreach (IPAddress ip in hostEntry.AddressList)
+        {
+            if (ip.AddressFamily == AddressFamily.InterNetwork) // InterNetworkV6 是 IPv6
+            {
+                return ip.ToString();
+            }
+        }
+
+        // 如果循环结束都没找到，返回错误信息
+        return "未找到 IPv4 地址，请检查网络连接";
     }
 }
 
