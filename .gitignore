@@ -34,7 +34,7 @@
 *.pdb
 *.vcxproj
 *.vcxproj.filters
-*.dll
+#*.dll
 
 # 例外规则（必须放在 *.dll 之后才能生效）
 !/Assets/**/OSCsharp.dll
