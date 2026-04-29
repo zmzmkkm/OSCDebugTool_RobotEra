@@ -42,15 +42,11 @@ namespace Prospect
             foreach (object item in args.Packet.Data)
             {
                 // Debug.Log("获取到的数据: \naddress:" + args.Address + "\nvalue:" + item);
-                
 
                 DistributeMessage(args.Address.TrimStart('/'), item);
             }
         }
 
-
-        private List<Vector7> aaa = new List<Vector7>();
-        private bool vvv = true;
 
         /// <summary>
         /// 消息处理分发
@@ -63,24 +59,19 @@ namespace Prospect
                     NetManager.Instance.ShowPowerRightLines(SerializeTool.DeSerialize<Vector7>(value as byte[]));
                     break;
                 case "headPos":
-                    NetManager.Instance.ShowPowerLines(SerializeTool.DeSerialize<Vector7>(value  as byte[]));
-                    // NetManager.Instance.ShowPowerLines(SerializeTool.DeSerializeJson<Vector7>(value  as string));
-                    // if (vvv)
-                    // {
-                    //     aaa.Add(SerializeTool.DeSerializeJson<Vector7>(value));
-                    //     if (aaa.Count > 1300)
-                    //     {
-                    //         SerializeTool.SerializeToFileJson(Application.streamingAssetsPath + "/OldX.json", aaa);
-                    //         vvv = false;
-                    //     }
-                    // }
-                
-                
+                    NetManager.Instance.ShowPowerLines(SerializeTool.DeSerialize<Vector7>(value as byte[]));
                     break;
                 case "gamePadPosLeft":
-                    NetManager.Instance.ShowPowerLeftLines(SerializeTool.DeSerialize<Vector7>(value  as byte[]));
+                    NetManager.Instance.ShowPowerLeftLines(SerializeTool.DeSerialize<Vector7>(value as byte[]));
                     break;
-            
+
+                case "handPosRight":
+                    NetManager.Instance.ShowPowerRightLines(SerializeTool.DeSerialize<List<Vector7>>(value as byte[])[0]);
+                    break;
+                case "handPosLeft":
+                    NetManager.Instance.ShowPowerLeftLines(SerializeTool.DeSerialize<List<Vector7>>(value as byte[])[0]);
+                    break;
+
                 case "Log":
                     var logMsg = SerializeTool.DeSerializeJson<LogMsg>(value as string);
                     switch (logMsg.type)
@@ -95,22 +86,13 @@ namespace Prospect
                             Debug.LogError(logMsg.log + "\n\n" + logMsg.stackTrace + "\n\n");
                             break;
                     }
-            
-                    break;
-            
-                // case "speed":
-                //     var parts = value.Replace("(", "").Replace(")", "").Split(',');
-                //     NetManager.Instance.ShowSpeedLines(new Vector2(float.Parse(parts[0]), float.Parse(parts[1])));
-                //     break;
-            
-                case "CHAZHI":
-                    NetManager.Instance.ShowSpeedLines((float)value);
+
                     break;
                 case "rightInTracking":
                     NetManager.Instance.rightInTrackingToggle.isOn = (bool)value;
                     break;
                 case "leftInTracking":
-                    NetManager.Instance.leftInTrackingToggle.isOn =  (bool)value;
+                    NetManager.Instance.leftInTrackingToggle.isOn = (bool)value;
                     break;
             }
         }
