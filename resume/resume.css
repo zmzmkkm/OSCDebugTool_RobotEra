@@ -1,0 +1,289 @@
+@page {
+  size: A4;
+  margin: 0;
+}
+
+:root {
+  --page-w: 210mm;
+  --page-h: 297mm;
+  --page-pad: 6.5mm;
+  --text: #1c2430;
+  --muted: #586273;
+  --accent: #1d4e89;
+  --accent-soft: #ecf4ff;
+  --line: #d9e2ec;
+  --font: "Microsoft YaHei", "微软雅黑", "PingFang SC", "Noto Sans CJK SC", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #eef2f6;
+  color: var(--text);
+  font-family: var(--font);
+}
+
+body {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.page {
+  width: var(--page-w);
+  min-height: var(--page-h);
+  height: var(--page-h);
+  margin: 0 auto;
+  padding: var(--page-pad);
+  background: #fff;
+  display: grid;
+  grid-template-columns: 65mm 1fr;
+  column-gap: 4.8mm;
+  overflow: hidden;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 2.3mm;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 2mm;
+}
+
+.name-block {
+  padding: 3.2mm 3mm 2.6mm;
+  background: linear-gradient(180deg, #f3f8ff 0%, #ebf3ff 100%);
+  border: 1px solid #d4e3f7;
+  border-radius: 3mm;
+}
+
+.name {
+  font-size: 18pt;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: 0.6mm;
+  color: #163c68;
+}
+
+.tagline {
+  margin-top: 1.3mm;
+  font-size: 7.1pt;
+  color: var(--muted);
+  line-height: 1.2;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2mm 2mm;
+  padding: 2.4mm 3mm;
+  border: 1px solid var(--line);
+  border-radius: 2.5mm;
+}
+
+.fact {
+  min-width: 0;
+}
+
+.fact-label {
+  font-size: 6.1pt;
+  color: #6f7a88;
+  line-height: 1.1;
+}
+
+.fact-value {
+  margin-top: 0.4mm;
+  font-size: 7.15pt;
+  font-weight: 700;
+  line-height: 1.16;
+  word-break: break-all;
+}
+
+.section {
+  border: 1px solid var(--line);
+  border-radius: 2.5mm;
+  padding: 2.2mm 2.8mm 2mm;
+}
+
+.section-title {
+  margin: 0 0 1.1mm;
+  font-size: 8pt;
+  line-height: 1.1;
+  font-weight: 800;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 1.3mm;
+}
+
+.section-title::before {
+  content: "";
+  width: 1.5mm;
+  height: 1.5mm;
+  border-radius: 50%;
+  background: var(--accent);
+  flex: 0 0 auto;
+}
+
+.target-line,
+.stack-line,
+.adv-item,
+.cert-item,
+.experience-bullets,
+.result-lines,
+.lead-list {
+  font-size: 6.55pt;
+  line-height: 1.28;
+}
+
+.target-line + .target-line,
+.stack-line + .stack-line,
+.adv-item + .adv-item,
+.cert-item + .cert-item {
+  margin-top: 0.7mm;
+}
+
+.label {
+  font-weight: 800;
+  color: #293648;
+}
+
+.stack-line,
+.adv-item,
+.cert-item {
+  text-align: justify;
+}
+
+.compact-note {
+  font-size: 6.2pt;
+  color: #6a7480;
+  line-height: 1.2;
+}
+
+.experience-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.55mm;
+}
+
+.job {
+  border: 1px solid var(--line);
+  border-radius: 2.5mm;
+  padding: 1.8mm 2.2mm 1.65mm;
+  break-inside: avoid;
+}
+
+.job-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1.2mm 2mm;
+  align-items: end;
+  margin-bottom: 0.7mm;
+}
+
+.job-company {
+  font-size: 7.4pt;
+  line-height: 1.15;
+  font-weight: 800;
+  color: #1d2f45;
+}
+
+.job-meta {
+  font-size: 6.15pt;
+  line-height: 1.1;
+  color: #6a7480;
+  white-space: nowrap;
+}
+
+.job-role {
+  font-size: 6.45pt;
+  line-height: 1.14;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 0.45mm;
+}
+
+.lead-list,
+.experience-bullets,
+.result-lines {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lead-list li,
+.experience-bullets li,
+.result-lines li {
+  margin: 0;
+  padding: 0;
+}
+
+.lead-list li + li,
+.experience-bullets li + li,
+.result-lines li + li {
+  margin-top: 0.35mm;
+}
+
+.group-title {
+  display: inline-block;
+  margin-right: 1mm;
+  font-weight: 800;
+  color: #2f3b4f;
+}
+
+.inline-chip {
+  display: inline-block;
+  padding: 0.15mm 1.2mm;
+  border-radius: 1.5mm;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 5.9pt;
+  font-weight: 700;
+  vertical-align: baseline;
+  margin-left: 1.2mm;
+}
+
+.footer-note {
+  margin-top: auto;
+  font-size: 5.7pt;
+  line-height: 1.15;
+  color: #7b8490;
+  text-align: right;
+}
+
+@media screen {
+  body {
+    padding: 8mm 0;
+  }
+
+  .page {
+    box-shadow: 0 4mm 14mm rgba(37, 56, 88, 0.12);
+  }
+}
+
+@media print {
+  html,
+  body {
+    width: var(--page-w);
+    height: var(--page-h);
+    background: #fff;
+  }
+
+  body {
+    padding: 0;
+  }
+
+  .page {
+    margin: 0;
+    box-shadow: none;
+  }
+}
+
