@@ -1,0 +1,356 @@
+﻿@font-face {
+    font-family: 'SourceHanSansCN';
+    src: url('../Assets/Art/Font/Original/SourceHanSansCN_Normal.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'BahnschriftCustom';
+    src: url('../Assets/Art/Font/Original/bahnschrift.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'EurostileCustom';
+    src: url('../Assets/Art/Font/Original/EurostileLTStd_Bold.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+}
+
+:root {
+    --bg: #eef8ff;
+    --paper: #fbfeff;
+    --panel: #f8fcff;
+    --panel-strong: #edf8ff;
+    --ink: #1e4f73;
+    --text: #3f617b;
+    --muted: #6f92ac;
+    --line: rgba(86, 170, 225, 0.24);
+    --accent: #73cfff;
+    --accent-deep: #3ca7e0;
+    --accent-soft: rgba(115, 207, 255, 0.18);
+    --shadow: 0 8px 18px rgba(89, 170, 219, 0.12);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'SourceHanSansCN', 'Microsoft YaHei', sans-serif;
+}
+
+body {
+    width: 210mm;
+    height: 297mm;
+}
+
+.page {
+    display: grid;
+    grid-template-columns: 58mm 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+        'top top'
+        'left right';
+    gap: 3.2mm;
+    width: 210mm;
+    height: 297mm;
+    padding: 5.2mm;
+    overflow: hidden;
+    background: linear-gradient(180deg, #fafdff 0%, #f2fbff 100%);
+}
+
+.topbar {
+    grid-area: top;
+}
+
+.leftbar {
+    grid-area: left;
+}
+
+.rightbar {
+    grid-area: right;
+}
+
+.top-panel {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr 0.78fr;
+    gap: 2.4mm;
+    align-items: stretch;
+    padding: 3.4mm;
+}
+
+.topbar-main {
+    padding: 1.2mm 1.4mm;
+}
+
+.eyebrow {
+    margin: 0 0 1.2mm;
+    color: var(--accent-deep);
+    letter-spacing: 0.7px;
+    font: 700 8.2pt/1.1 'BahnschriftCustom', 'Segoe UI', sans-serif;
+}
+
+.topbar-main h1 {
+    margin: 0;
+    color: var(--ink);
+    font: 700 24pt/1 'SourceHanSansCN', 'Microsoft YaHei', sans-serif;
+    letter-spacing: 0.8px;
+}
+
+.tagline {
+    margin: 1.3mm 0 0;
+    color: var(--ink);
+    font-size: 8.35pt;
+    line-height: 1.28;
+    font-weight: 700;
+}
+
+.tagline.secondary {
+    color: var(--text);
+    font-weight: 400;
+}
+
+.panel {
+    margin-bottom: 2.2mm;
+    padding: 2.3mm 2.5mm;
+    border: 1px solid var(--line);
+    border-radius: 2.6mm;
+    background: linear-gradient(180deg, var(--panel) 0%, rgba(248, 252, 255, 0.98) 100%);
+    box-shadow: var(--shadow);
+}
+
+.panel.compact {
+    padding-top: 2.1mm;
+    padding-bottom: 2.1mm;
+}
+
+.top-card {
+    margin-bottom: 0;
+    background: linear-gradient(180deg, #fafdff 0%, #f1faff 100%);
+}
+
+.accent-panel {
+    background: linear-gradient(180deg, #eef9ff 0%, #e7f7ff 100%);
+}
+
+.panel h2,
+.section-head h2 {
+    margin: 0 0 1.4mm;
+    color: var(--ink);
+    font: 700 9.4pt/1.1 'EurostileCustom', 'BahnschriftCustom', sans-serif;
+    letter-spacing: 0.45px;
+}
+
+.info-grid {
+    display: grid;
+    gap: 1.5mm 1.8mm;
+}
+
+.info-grid-2 {
+    grid-template-columns: 1fr 1fr;
+}
+
+.info-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.info-grid div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45mm;
+}
+
+.info-grid span,
+.stack-group span {
+    color: var(--muted);
+    font-size: 6.7pt;
+    letter-spacing: 0.2px;
+}
+
+.info-grid strong {
+    color: var(--ink);
+    font-size: 7.7pt;
+    line-height: 1.22;
+    font-weight: 700;
+}
+
+.panel p,
+.panel li {
+    margin: 0;
+    font-size: 7.15pt;
+    line-height: 1.28;
+    color: var(--text);
+}
+
+.intent-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9mm;
+    margin-top: 0.8mm;
+    color: var(--ink);
+    font-size: 7.2pt;
+    font-weight: 700;
+}
+
+.stack-group {
+    display: grid;
+    gap: 0.95mm;
+}
+
+.stack-group p span {
+    display: inline-block;
+    min-width: 13mm;
+    margin-right: 0.8mm;
+    color: var(--accent-deep);
+    font-weight: 700;
+}
+
+.adv-list,
+.cert-list {
+    margin: 0;
+    padding-left: 3.1mm;
+}
+
+.adv-list li,
+.cert-list li {
+    margin-bottom: 0.9mm;
+}
+
+.cert-list li:last-child,
+.adv-list li:last-child {
+    margin-bottom: 0;
+}
+
+.section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 1.7mm;
+    padding-bottom: 1.2mm;
+    border-bottom: 1px solid var(--line);
+}
+
+.section-head h2 {
+    margin: 0;
+    color: var(--ink);
+}
+
+.section-head p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 6.8pt;
+}
+
+.experience-section {
+    position: relative;
+}
+
+.job {
+    position: relative;
+    margin-bottom: 1.5mm;
+    padding: 2.2mm 2.6mm 2.05mm 4.2mm;
+    border: 1px solid var(--line);
+    border-radius: 2.5mm;
+    background: linear-gradient(180deg, #ffffff 0%, #f7fcff 100%);
+}
+
+.job::before {
+    content: '';
+    position: absolute;
+    left: 1.6mm;
+    top: 2.6mm;
+    bottom: 2.6mm;
+    width: 0.95mm;
+    border-radius: 2mm;
+    background: linear-gradient(180deg, var(--accent), var(--accent-deep));
+}
+
+.job-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 2.6mm;
+    margin-bottom: 0.95mm;
+}
+
+.job-head h3 {
+    margin: 0;
+    color: var(--ink);
+    font-size: 8.75pt;
+    line-height: 1.08;
+}
+
+.job-head p {
+    margin: 0.45mm 0 0;
+    color: var(--accent-deep);
+    font-size: 6.9pt;
+    line-height: 1.15;
+    font-weight: 700;
+}
+
+.job-meta {
+    padding: 0.65mm 1.6mm;
+    border-radius: 99px;
+    background: var(--accent-soft);
+    color: var(--accent-deep);
+    font: 700 6.5pt/1.15 'BahnschriftCustom', 'Segoe UI', sans-serif;
+    white-space: nowrap;
+}
+
+.job-body {
+    display: grid;
+    gap: 0.7mm;
+}
+
+.job-body p {
+    margin: 0;
+    color: var(--text);
+    font-size: 7.05pt;
+    line-height: 1.28;
+    text-align: justify;
+}
+
+.job-body strong {
+    color: var(--ink);
+}
+
+.compact-job .job-body p {
+    font-size: 6.95pt;
+    line-height: 1.24;
+}
+
+.last-job {
+    margin-bottom: 0;
+}
+
+@page {
+    size: A4;
+    margin: 0;
+}
+
+@media print {
+    html,
+    body {
+        width: 210mm;
+        height: 297mm;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    body {
+        background: none;
+    }
+
+    .page {
+        width: 210mm;
+        height: 297mm;
+    }
+}
